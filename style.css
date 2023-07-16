@@ -1,3 +1,92 @@
+html {
+    scroll-behavior: smooth;
+    /*Adds smooth scrolling instead of snapping to element*/
+}
+
+body{
+    background-color: ivory;
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+#from-top-scroll ul li{
+    display: inline-block;
+    margin: 0 10px;
+}
+
+#from-left-scroll ul{
+    position:fixed;
+    top:50%;
+    left:0;
+    transform: translateY(-50%);
+    margin:0;
+    padding:0;
+    z-index:1;
+}
+
+#from-left-scroll ul li{
+    list-style:none;
+}
+
+#from-left-scroll ul li a{
+    display: block;
+    text-decoration: none;
+    height: 30px;
+    line-height: 30px;
+    list-style: none;
+    font-size: 15px;
+    background: #fff;
+    width: 140px;
+    color: #262626;
+    margin: 4px 0;
+    padding-left: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    font-weight: normal;
+
+}
+
+#container{
+    width: 100%;
+    height: 100vh;
+    
+}
+
+#container div{
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+}
+
+#container div#programming_page{
+    background-color: rgb(145, 51, 51);
+}
+#container div#graphicdesign_page{
+    background-color: rgb(64, 143, 50);
+}
+#container div#music_page{
+    background-color: rgb(75, 137, 230);
+}
+
+#element {
+    height: 100px;
+    width: 100%;
+    background-color: red;
+  
+    scroll-margin-block-start: 110px;
+    /*Adds margin to the top of the viewport*/
+    
+    scroll-margin-block-end: 110pxx;
+    /*Adds margin to the bottom of the viewport*/
+}
+  
+#otherElement {
+    padding-top: 500px;
+    width: 100%;
+}
+
 .header{
     text-align: center;
 }
