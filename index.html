@@ -5,21 +5,33 @@
 <title>Jeremiah Thomas</title>
     <div class="header">
         <h1>Jeremiah Thomas</h1>
-        <hr class="rounded">
     </div>
     <link rel="stylesheet" href="style.css" type="text">
 
 </head>
 
 <body>
+
+    <!--scroll to top button-->
+    <div style="position: fixed; bottom: 70px; right: 25px; z-index: 900">
+        <a href="#top">
+            <img class=" lazyloaded" src="https://imthemoisturizer.com/wp-content/uploads/2022/04/Top.svg" data-src="https://imthemoisturizer.com/wp-content/uploads/2022/04/Top.svg" alt="Boton subir" width="40" height="40">
+          </a>
+        </div>
+        <div style="position: fixed; bottom: 25px; right: 25px; z-index: 900">
+          <a href="#fin">
+            <img class=" lazyloaded" src="https://imthemoisturizer.com/wp-content/uploads/2022/04/Bottom.svg" data-src="https://imthemoisturizer.com/wp-content/uploads/2022/04/Bottom.svg" alt="Boton bajada" width="40" height="40">
+        </div>
+
+
     <script src="script.js"></script>
 
     <!--scroll down onclick from top-->
     <div id="from-top-scroll">
         <ul>
-            <li><a href="#programming_page"><h2>Programming</h2></a></li>
-            <li><a href="#graphicdesign_page"><h2>Graphic Design</h2></a></li>
-            <li><a href="#music_page"><h2>Music</h2></a></li>
+            <li><a href="#programming_page"><icon></icon></a></li>
+            <li><a href="#graphicdesign_page"><icon>Graphic Design</icon></a></li>
+            <li><a href="#music_page"><icon>Music</icon></a></li>
         </ul>
     </div>
 
@@ -32,10 +44,11 @@
         </ul>
     </div>
     
+    <!--pages-->
     <div id="container">
-        <div id="programming_page"><h1>programming</h1></div>
-        <div id="graphicdesign_page"><h1>graphic design</h1></div>
-        <div id="music_page"><h1>music</h1></div>
+        <div id="programming_page"></div>
+        <div id="graphicdesign_page"></div>
+        <div id="music_page"></div>
     </div>
 </body>
 
