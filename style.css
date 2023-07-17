@@ -10,10 +10,20 @@ body{
     font-family: sans-serif;
 }
 
+/*top menu*/
+#from-top-scroll{
+    text-align: center;
+
+}
+
 #from-top-scroll ul li{
     display: inline-block;
     margin: 0 10px;
+    justify-content: 50%;
 }
+
+/*left menu (needs to appear only after screen is 
+past programming page*/
 
 #from-left-scroll ul{
     position:fixed;
@@ -82,17 +92,14 @@ body{
     /*Adds margin to the bottom of the viewport*/
 }
   
-#otherElement {
-    padding-top: 500px;
-    width: 100%;
-}
-
 .header{
     text-align: center;
 }
 
-hr.rounded {
-    border-top: 2px solid #bbb;
-    border-radius: 5px;
-    position: relative;
-  }
+.btn_controls {
+    display: none;
+}
+.btn-nav-vertical.top,
+.btn-nav-vertical.fin {
+    display: none;
+}
