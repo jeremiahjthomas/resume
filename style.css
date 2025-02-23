@@ -4,10 +4,15 @@ html {
 }
 
 body{
-    background-color: ivory;
+    background-color: #f1faee;
     margin: 0;
     padding: 0;
     font-family: sans-serif;
+}
+
+a{
+    text-decoration: none;
+    color: #262626;
 }
 
 /*top menu*/
@@ -19,7 +24,6 @@ body{
 #from-top-scroll ul li{
     display: inline-block;
     margin: 0 10px;
-    justify-content: 50%;
 }
 
 /*left menu (needs to appear only after screen is 
@@ -28,15 +32,41 @@ past programming page*/
 #from-left-scroll ul{
     position:fixed;
     top:50%;
-    left:0;
     transform: translateY(-50%);
-    margin:0;
     padding:0;
     z-index:1;
+    opacity: 0.5;
+    transition: padding 0.3s ease-in;
+}
+
+#from-left-scroll ul:hover{
+    padding: 0 10px;
+    opacity: 1;
+    transition: padding 0.3s ease-in;
+}
+#from-left-scroll ul li{
+    list-style:none;
+    margin: 0 10px;
+}
+
+#from-left-scroll ul:hover{
+    position:fixed;
+    top:50%;
+    transform: translateY(-50%);
+    margin:0;
+    z-index:1;
+
 }
 
 #from-left-scroll ul li{
     list-style:none;
+    
+}
+
+#from-left-scroll ul li:hover{
+    background: #a8dadc;
+    opacity: 1;
+    transition: opacity o.3s ease-in-out;
 }
 
 #from-left-scroll ul li a{
@@ -46,7 +76,7 @@ past programming page*/
     line-height: 30px;
     list-style: none;
     font-size: 15px;
-    background: #fff;
+    background: #a8dadc;
     width: 140px;
     color: #262626;
     margin: 4px 0;
@@ -71,14 +101,17 @@ past programming page*/
 }
 
 #container div#programming_page{
-    background-color: rgb(145, 51, 51);
+    background-color: #e63946;
 }
-#container div#graphicdesign_page{
-    background-color: rgb(64, 143, 50);
+#container div#graphic_design_page{
+    background-color: #457b9d;
 }
 #container div#music_page{
-    background-color: rgb(75, 137, 230);
+    background-color: #1d3557;
 }
+/* #container div#electrical_page{
+    background-color: rgb(212, 216, 134);
+} */
 
 #element {
     height: 100px;
