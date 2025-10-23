@@ -47,6 +47,16 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        tile: {
+          DEFAULT: "hsl(var(--tile))",
+          foreground: "hsl(var(--tile-foreground))",
+          shadow: "hsl(var(--tile-shadow))",
+          hover: "hsl(var(--tile-hover))",
+        },
+        board: {
+          DEFAULT: "hsl(var(--board))",
+          dark: "hsl(var(--board-dark))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -80,10 +90,29 @@ export default {
             height: "0",
           },
         },
+        "tile-flip": {
+          "0%": { transform: "rotateY(0deg)" },
+          "100%": { transform: "rotateY(360deg)" },
+        },
+        "tile-place": {
+          "0%": { transform: "scale(1.2) translateY(-10px)", opacity: "0.8" },
+          "100%": { transform: "scale(1) translateY(0)", opacity: "1" },
+        },
+        "slide-up": {
+          "0%": { transform: "translateY(20px)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "tile-flip": "tile-flip 0.6s ease-in-out",
+        "tile-place": "tile-place 0.3s ease-out",
+        "slide-up": "slide-up 0.5s ease-out",
+      },
+      fontFamily: {
+        scrabble: ["Arial Black", "sans-serif"],
+        content: ["Georgia", "serif"],
       },
     },
   },
