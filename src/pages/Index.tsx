@@ -19,7 +19,7 @@ const BIO = "BIO";
 
 const Index = () => {
   const [openSection, setOpenSection] = useState<string | null>(null);
-  const [availableTiles, setAvailableTiles] = useState<string[]>(["P", "B", "O"]);
+  const [availableTiles, setAvailableTiles] = useState<string[]>(["P", "B", "O", "R"]);
   const [draggedTile, setDraggedTile] = useState<string | null>(null);
   
   // Track which letters are placed for each word
@@ -28,9 +28,9 @@ const Index = () => {
     projects: Set<number>;
     bio: Set<number>;
   }>({
-    experience: new Set([0, 1, 3, 4, 5, 6, 7, 8, 9]), // All except P at index 2
-    projects: new Set([0, 2, 3, 4, 5, 6, 7]), // All except R at index 1 and O at index 2
-    bio: new Set([1]), // Only I is placed, need B and O
+    experience: new Set([0, 1, 3, 4, 6, 7, 8, 9]), // All except P at index 2 and I at index 5
+    projects: new Set([3, 4, 5, 6, 7]), // Missing P(0), R(1), O(2)
+    bio: new Set(), // All missing: B(0), I(1), O(2) - but I is shared with EXPERIENCE
   });
 
   // Create the crossword grid
@@ -62,10 +62,12 @@ const Index = () => {
       };
     });
 
-    // BIO vertical (starting at row 2, col 6 - the I position)
+    // BIO vertical (starting at row 2, col 6 - the I position in EXPERIENCE)
     BIO.split("").forEach((letter, idx) => {
       const row = 2 + idx;
-      // Skip I (index 1) as it's shared with EXPERIENCE
+      
+      // I (index 1) is shared with EXPERIENCE at grid[2][6]
+      // Only render B and O for BIO word
       if (idx === 1) return;
       
       grid[row][6] = {
@@ -103,12 +105,24 @@ const Index = () => {
       if (idx === 2) {
         newPlacedLetters.projects.add(0);
       }
+      // I is shared with BIO
+      if (idx === 5) {
+        newPlacedLetters.bio.add(1);
+      }
     } else if (cell.wordId === "projects") {
       const idx = row - 2;
       newPlacedLetters.projects.add(idx);
+      // P is shared with EXPERIENCE
+      if (idx === 0) {
+        newPlacedLetters.experience.add(2);
+      }
     } else if (cell.wordId === "bio") {
       const idx = row - 2;
       newPlacedLetters.bio.add(idx);
+      // I is shared with EXPERIENCE
+      if (idx === 1) {
+        newPlacedLetters.experience.add(5);
+      }
     }
 
     setPlacedLetters(newPlacedLetters);
