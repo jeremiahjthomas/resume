@@ -1,161 +1,311 @@
 import { useState } from "react";
-import { WordPuzzle } from "@/components/WordPuzzle";
-import { TileRack } from "@/components/TileRack";
+import { CrosswordGrid } from "@/components/CrosswordGrid";
+import { DraggableTile } from "@/components/DraggableTile";
 import { ResumeSection } from "@/components/ResumeSection";
 import { toast } from "sonner";
 
-interface PuzzleConfig {
-  word: string;
-  missingIndex: number;
-  missingLetter: string;
-  section: string;
+interface GridCell {
+  letter: string;
+  wordId: string;
+  isPlaced: boolean;
+  isEmpty: boolean;
 }
 
-const puzzles: PuzzleConfig[] = [
-  { word: "BIO", missingIndex: 2, missingLetter: "O", section: "bio" },
-  { word: "PROJECTS", missingIndex: 0, missingLetter: "P", section: "projects" },
-  { word: "EXPERIENCE", missingIndex: 9, missingLetter: "E", section: "experience" },
-];
+// Word configuration for crossword
+// EXPERIENCE horizontal, PROJECTS down from P, BIO down from I
+const EXPERIENCE = "EXPERIENCE";
+const PROJECTS = "PROJECTS";
+const BIO = "BIO";
 
 const Index = () => {
-  const [completedSections, setCompletedSections] = useState<Set<string>>(new Set());
-  const [availableTiles, setAvailableTiles] = useState<string[]>(["O", "P", "E"]);
-  const [selectedTile, setSelectedTile] = useState<{ letter: string; index: number } | null>(null);
+  const [openSection, setOpenSection] = useState<string | null>(null);
+  const [availableTiles, setAvailableTiles] = useState<string[]>(["P", "B", "O"]);
+  const [draggedTile, setDraggedTile] = useState<string | null>(null);
+  
+  // Track which letters are placed for each word
+  const [placedLetters, setPlacedLetters] = useState<{
+    experience: Set<number>;
+    projects: Set<number>;
+    bio: Set<number>;
+  }>({
+    experience: new Set([0, 1, 3, 4, 5, 6, 7, 8, 9]), // All except P at index 2
+    projects: new Set([0, 2, 3, 4, 5, 6, 7]), // All except R at index 1 and O at index 2
+    bio: new Set([1]), // Only I is placed, need B and O
+  });
 
-  const handleTileClick = (tile: string, index: number) => {
-    if (selectedTile?.index === index) {
-      setSelectedTile(null);
-      toast.info("Tile deselected");
-    } else {
-      setSelectedTile({ letter: tile, index });
-      toast.info(`Selected tile: ${tile}`);
-    }
+  // Create the crossword grid
+  const createGrid = (): (GridCell | null)[][] => {
+    const grid: (GridCell | null)[][] = Array(10).fill(null).map(() => Array(12).fill(null));
+    
+    // EXPERIENCE horizontal (row 2, starting at col 1)
+    EXPERIENCE.split("").forEach((letter, idx) => {
+      const col = 1 + idx;
+      grid[2][col] = {
+        letter,
+        wordId: "experience",
+        isPlaced: placedLetters.experience.has(idx),
+        isEmpty: !placedLetters.experience.has(idx),
+      };
+    });
+
+    // PROJECTS vertical (starting at row 2, col 3 - the P position)
+    PROJECTS.split("").forEach((letter, idx) => {
+      const row = 2 + idx;
+      // Skip P (index 0) as it's shared with EXPERIENCE
+      if (idx === 0) return;
+      
+      grid[row][3] = {
+        letter,
+        wordId: "projects",
+        isPlaced: placedLetters.projects.has(idx),
+        isEmpty: !placedLetters.projects.has(idx),
+      };
+    });
+
+    // BIO vertical (starting at row 2, col 6 - the I position)
+    BIO.split("").forEach((letter, idx) => {
+      const row = 2 + idx;
+      // Skip I (index 1) as it's shared with EXPERIENCE
+      if (idx === 1) return;
+      
+      grid[row][6] = {
+        letter,
+        wordId: "bio",
+        isPlaced: placedLetters.bio.has(idx),
+        isEmpty: !placedLetters.bio.has(idx),
+      };
+    });
+
+    return grid;
   };
 
-  const handleSlotClick = (puzzle: PuzzleConfig) => {
-    if (!selectedTile) {
-      toast.error("Select a tile from your rack first!");
+  const handleCellDrop = (row: number, col: number, letter: string) => {
+    const grid = createGrid();
+    const cell = grid[row][col];
+
+    if (!cell || !cell.isEmpty) {
+      toast.error("Can't place tile here!");
       return;
     }
 
-    if (selectedTile.letter !== puzzle.missingLetter) {
-      toast.error(`Wrong tile! You need '${puzzle.missingLetter}' for ${puzzle.word.toUpperCase()}`);
+    if (cell.letter.toUpperCase() !== letter.toUpperCase()) {
+      toast.error(`Wrong tile! This spot needs '${cell.letter}'`);
       return;
     }
 
-    // Correct tile placed
-    const newTiles = availableTiles.filter((_, i) => i !== selectedTile.index);
-    setAvailableTiles(newTiles);
-    setCompletedSections(prev => new Set([...prev, puzzle.section]));
-    setSelectedTile(null);
-    toast.success(`${puzzle.section.toUpperCase()} unlocked!`);
+    // Correct placement
+    const newPlacedLetters = { ...placedLetters };
+    
+    if (cell.wordId === "experience") {
+      const idx = col - 1;
+      newPlacedLetters.experience.add(idx);
+      // P is shared with PROJECTS
+      if (idx === 2) {
+        newPlacedLetters.projects.add(0);
+      }
+    } else if (cell.wordId === "projects") {
+      const idx = row - 2;
+      newPlacedLetters.projects.add(idx);
+    } else if (cell.wordId === "bio") {
+      const idx = row - 2;
+      newPlacedLetters.bio.add(idx);
+    }
+
+    setPlacedLetters(newPlacedLetters);
+    setAvailableTiles(prev => prev.filter(t => t !== letter));
+    
+    toast.success(`Correct! Tile placed.`);
+
+    // Check if word is complete
+    setTimeout(() => {
+      if (cell.wordId === "experience" && newPlacedLetters.experience.size === EXPERIENCE.length) {
+        toast.success("EXPERIENCE complete!");
+        setOpenSection("experience");
+      } else if (cell.wordId === "projects" && newPlacedLetters.projects.size === PROJECTS.length) {
+        toast.success("PROJECTS complete!");
+        setOpenSection("projects");
+      } else if (cell.wordId === "bio" && newPlacedLetters.bio.size === BIO.length) {
+        toast.success("BIO complete!");
+        setOpenSection("bio");
+      }
+    }, 300);
   };
 
-  const getPuzzleStatus = (section: string) => completedSections.has(section);
+  const isComplete = (wordId: string) => {
+    if (wordId === "experience") return placedLetters.experience.size === EXPERIENCE.length;
+    if (wordId === "projects") return placedLetters.projects.size === PROJECTS.length;
+    if (wordId === "bio") return placedLetters.bio.size === BIO.length;
+    return false;
+  };
+
+  const allComplete = isComplete("experience") && isComplete("projects") && isComplete("bio");
 
   return (
     <div className="min-h-screen bg-background p-4 sm:p-8 pb-32">
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center space-y-4 animate-slide-up">
           <h1 className="text-4xl sm:text-5xl font-bold text-foreground font-scrabble">
             SCRABBLE RESUME
           </h1>
           <p className="text-lg text-muted-foreground font-content">
-            Complete the words to unlock sections of the resume
+            Drag tiles to complete the crossword and unlock resume sections
           </p>
         </div>
 
-        {/* Puzzles */}
-        <div className="space-y-6">
-          {puzzles.map((puzzle, index) => (
-            <div
-              key={puzzle.section}
-              className="space-y-4"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <WordPuzzle
-                word={puzzle.word}
-                missingIndex={puzzle.missingIndex}
-                isCompleted={getPuzzleStatus(puzzle.section)}
-                onSlotClick={() => handleSlotClick(puzzle)}
-              />
-
-              <ResumeSection
-                title={puzzle.section.charAt(0).toUpperCase() + puzzle.section.slice(1)}
-                isVisible={getPuzzleStatus(puzzle.section)}
-                content={
-                  puzzle.section === "bio" ? (
-                    <div>
-                      <p className="text-base sm:text-lg leading-relaxed">
-                        Creative developer passionate about building innovative web experiences. 
-                        I specialize in React, TypeScript, and modern frontend technologies. 
-                        When I'm not coding, you can find me playing board games or exploring new design patterns.
-                      </p>
-                    </div>
-                  ) : puzzle.section === "projects" ? (
-                    <div className="space-y-4">
-                      <div>
-                        <h3 className="font-bold text-lg text-accent">Interactive Resume Builder</h3>
-                        <p className="text-muted-foreground">A Scrabble-themed resume that combines gaming with professional presentation</p>
-                        <p className="text-sm mt-1">Tech: React, TypeScript, Tailwind CSS</p>
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-lg text-accent">Task Management App</h3>
-                        <p className="text-muted-foreground">Full-stack productivity tool with real-time collaboration</p>
-                        <p className="text-sm mt-1">Tech: React, Node.js, PostgreSQL</p>
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-lg text-accent">Design System Library</h3>
-                        <p className="text-muted-foreground">Reusable component library with comprehensive documentation</p>
-                        <p className="text-sm mt-1">Tech: React, Storybook, Tailwind CSS</p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <div>
-                        <h3 className="font-bold text-lg text-accent">Senior Frontend Developer</h3>
-                        <p className="text-muted-foreground">Tech Innovation Inc. • 2022 - Present</p>
-                        <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
-                          <li>Led development of customer-facing web applications</li>
-                          <li>Improved performance by 40% through optimization</li>
-                          <li>Mentored junior developers and conducted code reviews</li>
-                        </ul>
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-lg text-accent">Frontend Developer</h3>
-                        <p className="text-muted-foreground">Creative Solutions Ltd. • 2020 - 2022</p>
-                        <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
-                          <li>Built responsive web applications using React</li>
-                          <li>Collaborated with designers to implement pixel-perfect UIs</li>
-                          <li>Integrated RESTful APIs and managed state with Redux</li>
-                        </ul>
-                      </div>
-                    </div>
-                  )
-                }
-              />
-            </div>
-          ))}
+        {/* Crossword Grid */}
+        <div className="flex justify-center animate-slide-up" style={{ animationDelay: "100ms" }}>
+          <CrosswordGrid grid={createGrid()} onCellDrop={handleCellDrop} />
         </div>
 
         {/* Completion Message */}
-        {completedSections.size === puzzles.length && (
-          <div className="text-center animate-slide-up bg-accent/20 rounded-lg p-6 border-2 border-accent">
+        {allComplete && !openSection && (
+          <div className="text-center animate-slide-up bg-accent/20 rounded-lg p-6 border-2 border-accent max-w-2xl mx-auto">
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground font-scrabble mb-2">
               CONGRATULATIONS!
             </h2>
             <p className="text-lg text-foreground font-content">
-              You've unlocked all sections of the resume! 🎉
+              You've completed all words! Click any word to view its section. 🎉
             </p>
           </div>
         )}
+
+        {/* Word Status Buttons */}
+        <div className="flex flex-wrap justify-center gap-4 animate-slide-up" style={{ animationDelay: "200ms" }}>
+          {["bio", "projects", "experience"].map((section) => (
+            <button
+              key={section}
+              onClick={() => isComplete(section) && setOpenSection(section)}
+              disabled={!isComplete(section)}
+              className={`px-6 py-3 rounded-lg font-scrabble text-lg transition-all ${
+                isComplete(section)
+                  ? "bg-tile hover:bg-tile-hover cursor-pointer shadow-lg hover:scale-105"
+                  : "bg-muted text-muted-foreground cursor-not-allowed"
+              }`}
+            >
+              {section.toUpperCase()} {isComplete(section) ? "✓" : "🔒"}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Tile Rack */}
       {availableTiles.length > 0 && (
-        <TileRack tiles={availableTiles} onTileClick={handleTileClick} />
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30">
+          <div className="bg-board-dark px-4 py-3 sm:px-6 sm:py-4 rounded-lg shadow-2xl border-4 border-tile-shadow">
+            <div className="flex gap-2 sm:gap-3">
+              {availableTiles.map((tile, index) => (
+                <DraggableTile
+                  key={index}
+                  letter={tile}
+                  onDragStart={() => setDraggedTile(tile)}
+                  onDragEnd={() => setDraggedTile(null)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
       )}
+
+      {/* Resume Sections */}
+      <ResumeSection
+        title="Bio"
+        isVisible={openSection === "bio"}
+        onClose={() => setOpenSection(null)}
+        content={
+          <div>
+            <p className="text-base sm:text-lg leading-relaxed">
+              Creative developer passionate about building innovative web experiences. 
+              I specialize in React, TypeScript, and modern frontend technologies. 
+              When I'm not coding, you can find me playing board games or exploring new design patterns.
+            </p>
+            <div className="mt-6 space-y-2">
+              <p><strong>Location:</strong> San Francisco, CA</p>
+              <p><strong>Email:</strong> developer@example.com</p>
+              <p><strong>GitHub:</strong> github.com/developer</p>
+            </div>
+          </div>
+        }
+      />
+
+      <ResumeSection
+        title="Projects"
+        isVisible={openSection === "projects"}
+        onClose={() => setOpenSection(null)}
+        content={
+          <div className="space-y-6">
+            <div>
+              <h3 className="font-bold text-xl text-accent mb-2">Interactive Resume Builder</h3>
+              <p className="text-muted-foreground mb-2">A Scrabble-themed resume that combines gaming with professional presentation</p>
+              <p className="text-sm mb-2"><strong>Tech:</strong> React, TypeScript, Tailwind CSS</p>
+              <p className="text-sm leading-relaxed">
+                Developed an engaging interactive resume experience using drag-and-drop functionality 
+                and crossword-style layout. Implemented smooth animations and responsive design.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-bold text-xl text-accent mb-2">Task Management App</h3>
+              <p className="text-muted-foreground mb-2">Full-stack productivity tool with real-time collaboration</p>
+              <p className="text-sm mb-2"><strong>Tech:</strong> React, Node.js, PostgreSQL, WebSocket</p>
+              <p className="text-sm leading-relaxed">
+                Built a collaborative task management platform with real-time updates, user authentication, 
+                and team workspace features. Handles 10,000+ daily active users.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-bold text-xl text-accent mb-2">Design System Library</h3>
+              <p className="text-muted-foreground mb-2">Reusable component library with comprehensive documentation</p>
+              <p className="text-sm mb-2"><strong>Tech:</strong> React, Storybook, Tailwind CSS</p>
+              <p className="text-sm leading-relaxed">
+                Created a comprehensive design system with 50+ components, complete with Storybook documentation 
+                and accessibility compliance. Adopted by 5 product teams.
+              </p>
+            </div>
+          </div>
+        }
+      />
+
+      <ResumeSection
+        title="Experience"
+        isVisible={openSection === "experience"}
+        onClose={() => setOpenSection(null)}
+        content={
+          <div className="space-y-6">
+            <div>
+              <h3 className="font-bold text-xl text-accent mb-1">Senior Frontend Developer</h3>
+              <p className="text-muted-foreground mb-3">Tech Innovation Inc. • 2022 - Present</p>
+              <ul className="list-disc list-inside space-y-2 text-sm sm:text-base">
+                <li>Led development of customer-facing web applications serving 500K+ users</li>
+                <li>Improved performance by 40% through code optimization and lazy loading</li>
+                <li>Mentored 5 junior developers and conducted weekly code reviews</li>
+                <li>Architected component library adopted across 3 major products</li>
+                <li>Collaborated with design team to implement pixel-perfect responsive UIs</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold text-xl text-accent mb-1">Frontend Developer</h3>
+              <p className="text-muted-foreground mb-3">Creative Solutions Ltd. • 2020 - 2022</p>
+              <ul className="list-disc list-inside space-y-2 text-sm sm:text-base">
+                <li>Built responsive web applications using React and modern JavaScript</li>
+                <li>Integrated RESTful APIs and managed complex state with Redux</li>
+                <li>Implemented automated testing with Jest and React Testing Library</li>
+                <li>Collaborated with cross-functional teams in Agile environment</li>
+                <li>Reduced bug rate by 30% through comprehensive test coverage</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold text-xl text-accent mb-1">Junior Web Developer</h3>
+              <p className="text-muted-foreground mb-3">StartupCo • 2019 - 2020</p>
+              <ul className="list-disc list-inside space-y-2 text-sm sm:text-base">
+                <li>Developed and maintained company website and landing pages</li>
+                <li>Created email templates and automated marketing workflows</li>
+                <li>Assisted in migration from legacy codebase to React</li>
+                <li>Participated in daily standups and sprint planning sessions</li>
+              </ul>
+            </div>
+          </div>
+        }
+      />
     </div>
   );
 };
