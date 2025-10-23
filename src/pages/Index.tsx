@@ -62,13 +62,13 @@ const Index = () => {
       };
     });
 
-    // BIO vertical (starting at row 2, col 6 - the I position in EXPERIENCE)
+    // BIO vertical (col 6, starting at row 1 - B above the I in EXPERIENCE)
+    // B at row 1, I at row 2 (shared with EXPERIENCE), O at row 3
     BIO.split("").forEach((letter, idx) => {
-      const row = 2 + idx;
+      const row = 1 + idx;
       
-      // I (index 1) is shared with EXPERIENCE at grid[2][6]
-      // Only render B and O for BIO word
-      if (idx === 1) return;
+      // I (index 1) at row 2 is shared with EXPERIENCE
+      if (idx === 1) return; // Skip rendering for BIO, EXPERIENCE will handle it
       
       grid[row][6] = {
         letter,
@@ -117,7 +117,7 @@ const Index = () => {
         newPlacedLetters.experience.add(2);
       }
     } else if (cell.wordId === "bio") {
-      const idx = row - 2;
+      const idx = row - 1; // BIO starts at row 1, not row 2
       newPlacedLetters.bio.add(idx);
       // I is shared with EXPERIENCE
       if (idx === 1) {
