@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { CrosswordGrid } from "@/components/CrosswordGrid";
 import { DraggableTile } from "@/components/DraggableTile";
 import { ResumeSection } from "@/components/ResumeSection";

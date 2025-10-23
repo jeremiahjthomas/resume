@@ -1,3 +1,4 @@
+import React from "react";
 import { ScrabbleTile } from "./ScrabbleTile";
 
 interface DraggableTileProps {
