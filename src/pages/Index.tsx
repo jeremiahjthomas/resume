@@ -184,7 +184,14 @@ const Index = () => {
     }
 
     setPlacedLetters(newPlacedLetters);
-    setAvailableTiles(prev => prev.filter(t => t !== letter));
+    // Remove only one instance of the placed letter
+    setAvailableTiles(prev => {
+      const index = prev.indexOf(letter);
+      if (index > -1) {
+        return [...prev.slice(0, index), ...prev.slice(index + 1)];
+      }
+      return prev;
+    });
     
     toast.success(`Correct! Tile placed.`);
 
