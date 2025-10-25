@@ -19,7 +19,7 @@ const BIO = "BIO";
 
 const Index = () => {
   const [openSection, setOpenSection] = useState<string | null>(null);
-  const [availableTiles, setAvailableTiles] = useState<string[]>(["P", "B", "O", "R"]);
+  const [availableTiles, setAvailableTiles] = useState<string[]>(["P", "B", "R"]);
   const [draggedTile, setDraggedTile] = useState<string | null>(null);
   
   // Track which letters are placed for each word
@@ -28,9 +28,9 @@ const Index = () => {
     projects: Set<number>;
     bio: Set<number>;
   }>({
-    experience: new Set([0, 1, 3, 4, 6, 7, 8, 9]), // All except P at index 2 and I at index 5
+    experience: new Set([0, 1, 3, 4, 5, 6, 7, 8, 9]), // All except P at index 2 (I at index 5 is placed)
     projects: new Set([3, 4, 5, 6, 7]), // Missing P(0), R(1), O(2)
-    bio: new Set(), // All missing: B(0), I(1), O(2) - but I is shared with EXPERIENCE
+    bio: new Set([1, 2]), // I(1) shared with EXPERIENCE and O(2) are placed, only B(0) missing
   });
 
   // Create the crossword grid
