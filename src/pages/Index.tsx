@@ -13,25 +13,32 @@ interface GridCell {
 
 // Word configuration for crossword
 // EXPERIENCE horizontal, PROJECTS down from P, BIO down from I
+// EDUCATION horizontal from E in PROJECTS, SKILLS horizontal from S in PROJECTS
 const EXPERIENCE = "EXPERIENCE";
 const PROJECTS = "PROJECTS";
 const BIO = "BIO";
+const EDUCATION = "EDUCATION";
+const SKILLS = "SKILLS";
 
 const Index = () => {
   const [openSection, setOpenSection] = useState<string | null>(null);
-  const [availableTiles, setAvailableTiles] = useState<string[]>(["S", "O", "C", "E"]);
+  const [availableTiles, setAvailableTiles] = useState<string[]>(["S", "O", "C", "E", "O", "N", "L", "S"]);
   const [draggedTile, setDraggedTile] = useState<string | null>(null);
   
   // Track which letters are placed for each word
-  // Users only place tiles at the END: PROJECT+S, BI+O, EXPERIEN+CE
+  // Users only place tiles at the END: PROJECT+S, BI+O, EXPERIEN+CE, EDUCATI+ON, SKIL+LS
   const [placedLetters, setPlacedLetters] = useState<{
     experience: Set<number>;
     projects: Set<number>;
     bio: Set<number>;
+    education: Set<number>;
+    skills: Set<number>;
   }>({
     experience: new Set([0, 1, 2, 3, 4, 5, 6, 7]), // EXPERIEN placed, missing C(8) and E(9)
     projects: new Set([0, 1, 2, 3, 4, 5, 6]), // PROJECT placed, missing S(7)
     bio: new Set([0, 1]), // BI placed, missing O(2)
+    education: new Set([0, 1, 2, 3, 4, 5, 6]), // EDUCATI placed, missing O(7) and N(8)
+    skills: new Set([0, 1, 2, 3]), // SKIL placed, missing L(4) and S(5)
   });
 
   // Create the crossword grid
@@ -79,6 +86,34 @@ const Index = () => {
       };
     });
 
+    // EDUCATION horizontal (row 6, starting at col 3 - the E in PROJECTS)
+    EDUCATION.split("").forEach((letter, idx) => {
+      const col = 3 + idx;
+      // Skip E (index 0) as it's shared with PROJECTS
+      if (idx === 0) return;
+      
+      grid[6][col] = {
+        letter,
+        wordId: "education",
+        isPlaced: placedLetters.education.has(idx),
+        isEmpty: !placedLetters.education.has(idx),
+      };
+    });
+
+    // SKILLS horizontal (row 9, starting at col 3 - the S in PROJECTS)
+    SKILLS.split("").forEach((letter, idx) => {
+      const col = 3 + idx;
+      // Skip S (index 0) as it's shared with PROJECTS
+      if (idx === 0) return;
+      
+      grid[9][col] = {
+        letter,
+        wordId: "skills",
+        isPlaced: placedLetters.skills.has(idx),
+        isEmpty: !placedLetters.skills.has(idx),
+      };
+    });
+
     return grid;
   };
 
@@ -117,12 +152,34 @@ const Index = () => {
       if (idx === 0) {
         newPlacedLetters.experience.add(2);
       }
+      // E is shared with EDUCATION
+      if (idx === 4) {
+        newPlacedLetters.education.add(0);
+      }
+      // S is shared with SKILLS
+      if (idx === 7) {
+        newPlacedLetters.skills.add(0);
+      }
     } else if (cell.wordId === "bio") {
       const idx = row - 1; // BIO starts at row 1, not row 2
       newPlacedLetters.bio.add(idx);
       // I is shared with EXPERIENCE
       if (idx === 1) {
         newPlacedLetters.experience.add(5);
+      }
+    } else if (cell.wordId === "education") {
+      const idx = col - 3;
+      newPlacedLetters.education.add(idx);
+      // E is shared with PROJECTS
+      if (idx === 0) {
+        newPlacedLetters.projects.add(4);
+      }
+    } else if (cell.wordId === "skills") {
+      const idx = col - 3;
+      newPlacedLetters.skills.add(idx);
+      // S is shared with PROJECTS
+      if (idx === 0) {
+        newPlacedLetters.projects.add(7);
       }
     }
 
@@ -142,6 +199,12 @@ const Index = () => {
       } else if (cell.wordId === "bio" && newPlacedLetters.bio.size === BIO.length) {
         toast.success("BIO complete!");
         setOpenSection("bio");
+      } else if (cell.wordId === "education" && newPlacedLetters.education.size === EDUCATION.length) {
+        toast.success("EDUCATION complete!");
+        setOpenSection("education");
+      } else if (cell.wordId === "skills" && newPlacedLetters.skills.size === SKILLS.length) {
+        toast.success("SKILLS complete!");
+        setOpenSection("skills");
       }
     }, 300);
   };
@@ -150,10 +213,13 @@ const Index = () => {
     if (wordId === "experience") return placedLetters.experience.size === EXPERIENCE.length;
     if (wordId === "projects") return placedLetters.projects.size === PROJECTS.length;
     if (wordId === "bio") return placedLetters.bio.size === BIO.length;
+    if (wordId === "education") return placedLetters.education.size === EDUCATION.length;
+    if (wordId === "skills") return placedLetters.skills.size === SKILLS.length;
     return false;
   };
 
-  const allComplete = isComplete("experience") && isComplete("projects") && isComplete("bio");
+  const allComplete = isComplete("experience") && isComplete("projects") && isComplete("bio") && 
+                      isComplete("education") && isComplete("skills");
 
   return (
     <div className="min-h-screen bg-background p-4 sm:p-8 pb-32">
@@ -187,7 +253,7 @@ const Index = () => {
 
         {/* Word Status Buttons */}
         <div className="flex flex-wrap justify-center gap-4 animate-slide-up" style={{ animationDelay: "200ms" }}>
-          {["bio", "projects", "experience"].map((section) => (
+          {["bio", "education", "skills", "projects", "experience"].map((section) => (
             <button
               key={section}
               onClick={() => isComplete(section) && setOpenSection(section)}
@@ -317,6 +383,71 @@ const Index = () => {
                 <li>Assisted in migration from legacy codebase to React</li>
                 <li>Participated in daily standups and sprint planning sessions</li>
               </ul>
+            </div>
+          </div>
+        }
+      />
+
+      <ResumeSection
+        title="Education"
+        isVisible={openSection === "education"}
+        onClose={() => setOpenSection(null)}
+        content={
+          <div className="space-y-6">
+            <div>
+              <h3 className="font-bold text-xl text-accent mb-1">Bachelor of Science in Computer Science</h3>
+              <p className="text-muted-foreground mb-3">State University • 2015 - 2019</p>
+              <ul className="list-disc list-inside space-y-2 text-sm sm:text-base">
+                <li>GPA: 3.8/4.0, Dean's List all semesters</li>
+                <li>Relevant coursework: Data Structures, Algorithms, Web Development, Database Systems</li>
+                <li>Senior project: Built a real-time collaboration platform using WebSocket</li>
+                <li>Member of Computer Science Club and Hackathon organizing committee</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold text-xl text-accent mb-1">Certifications</h3>
+              <ul className="list-disc list-inside space-y-2 text-sm sm:text-base">
+                <li>AWS Certified Developer - Associate (2023)</li>
+                <li>React Advanced Patterns Certificate (2022)</li>
+                <li>TypeScript Professional Certification (2021)</li>
+              </ul>
+            </div>
+          </div>
+        }
+      />
+
+      <ResumeSection
+        title="Skills"
+        isVisible={openSection === "skills"}
+        onClose={() => setOpenSection(null)}
+        content={
+          <div className="space-y-6">
+            <div>
+              <h3 className="font-bold text-xl text-accent mb-2">Frontend Technologies</h3>
+              <p className="text-sm sm:text-base">
+                React, TypeScript, JavaScript (ES6+), HTML5, CSS3, Tailwind CSS, Redux, React Query, 
+                Next.js, Vite, Webpack
+              </p>
+            </div>
+            <div>
+              <h3 className="font-bold text-xl text-accent mb-2">Backend & Database</h3>
+              <p className="text-sm sm:text-base">
+                Node.js, Express, PostgreSQL, MongoDB, REST APIs, GraphQL, Supabase
+              </p>
+            </div>
+            <div>
+              <h3 className="font-bold text-xl text-accent mb-2">Tools & Practices</h3>
+              <p className="text-sm sm:text-base">
+                Git, GitHub, CI/CD, Docker, Jest, React Testing Library, Storybook, Figma, 
+                Agile/Scrum, Code Review
+              </p>
+            </div>
+            <div>
+              <h3 className="font-bold text-xl text-accent mb-2">Soft Skills</h3>
+              <p className="text-sm sm:text-base">
+                Problem Solving, Team Leadership, Mentoring, Communication, Project Management, 
+                User Experience Design
+              </p>
             </div>
           </div>
         }
