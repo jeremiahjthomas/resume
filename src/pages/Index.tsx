@@ -13,32 +13,32 @@ interface GridCell {
 
 // Word configuration for crossword
 // EXPERIENCE horizontal, PROJECTS down from P, BIO down from I
-// EDUCATION horizontal from E in PROJECTS, SKILLS horizontal from S in PROJECTS
+// EDUCATION horizontal from E in PROJECTS, TOOLS horizontal from T in PROJECTS
 const EXPERIENCE = "EXPERIENCE";
 const PROJECTS = "PROJECTS";
 const BIO = "BIO";
 const EDUCATION = "EDUCATION";
-const SKILLS = "SKILLS";
+const TOOLS = "TOOLS";
 
 const Index = () => {
   const [openSection, setOpenSection] = useState<string | null>(null);
-  const [availableTiles, setAvailableTiles] = useState<string[]>(["S", "O", "C", "E", "O", "N", "L", "S"]);
+  const [availableTiles, setAvailableTiles] = useState<string[]>(["O", "E", "S", "N", "O", "L", "S"]);
   const [draggedTile, setDraggedTile] = useState<string | null>(null);
   
   // Track which letters are placed for each word
-  // Users only place tiles at the END: PROJECT+S, BI+O, EXPERIEN+CE, EDUCATI+ON, SKIL+LS
+  // Users only place tiles at the END: BI+O, EXPERIENC+E, PROJECT+S, EDUCATIO+N, TO+OLS
   const [placedLetters, setPlacedLetters] = useState<{
     experience: Set<number>;
     projects: Set<number>;
     bio: Set<number>;
     education: Set<number>;
-    skills: Set<number>;
+    tools: Set<number>;
   }>({
-    experience: new Set([0, 1, 2, 3, 4, 5, 6, 7]), // EXPERIEN placed, missing C(8) and E(9)
+    experience: new Set([0, 1, 2, 3, 4, 5, 6, 7, 8]), // EXPERIENC placed, missing E(9)
     projects: new Set([0, 1, 2, 3, 4, 5, 6]), // PROJECT placed, missing S(7)
     bio: new Set([0, 1]), // BI placed, missing O(2)
-    education: new Set([0, 1, 2, 3, 4, 5, 6]), // EDUCATI placed, missing O(7) and N(8)
-    skills: new Set([0, 1, 2, 3]), // SKIL placed, missing L(4) and S(5)
+    education: new Set([0, 1, 2, 3, 4, 5, 6, 7]), // EDUCATIO placed, missing N(8)
+    tools: new Set([0, 1]), // TO placed, missing O(2), L(3), S(4)
   });
 
   // Create the crossword grid
@@ -100,17 +100,17 @@ const Index = () => {
       };
     });
 
-    // SKILLS horizontal (row 9, starting at col 3 - the S in PROJECTS)
-    SKILLS.split("").forEach((letter, idx) => {
+    // TOOLS horizontal (row 8, starting at col 3 - the T in PROJECTS)
+    TOOLS.split("").forEach((letter, idx) => {
       const col = 3 + idx;
-      // Skip S (index 0) as it's shared with PROJECTS
+      // Skip T (index 0) as it's shared with PROJECTS
       if (idx === 0) return;
       
-      grid[9][col] = {
+      grid[8][col] = {
         letter,
-        wordId: "skills",
-        isPlaced: placedLetters.skills.has(idx),
-        isEmpty: !placedLetters.skills.has(idx),
+        wordId: "tools",
+        isPlaced: placedLetters.tools.has(idx),
+        isEmpty: !placedLetters.tools.has(idx),
       };
     });
 
@@ -156,9 +156,9 @@ const Index = () => {
       if (idx === 4) {
         newPlacedLetters.education.add(0);
       }
-      // S is shared with SKILLS
-      if (idx === 7) {
-        newPlacedLetters.skills.add(0);
+      // T is shared with TOOLS
+      if (idx === 6) {
+        newPlacedLetters.tools.add(0);
       }
     } else if (cell.wordId === "bio") {
       const idx = row - 1; // BIO starts at row 1, not row 2
@@ -174,12 +174,12 @@ const Index = () => {
       if (idx === 0) {
         newPlacedLetters.projects.add(4);
       }
-    } else if (cell.wordId === "skills") {
+    } else if (cell.wordId === "tools") {
       const idx = col - 3;
-      newPlacedLetters.skills.add(idx);
-      // S is shared with PROJECTS
+      newPlacedLetters.tools.add(idx);
+      // T is shared with PROJECTS
       if (idx === 0) {
-        newPlacedLetters.projects.add(7);
+        newPlacedLetters.projects.add(6);
       }
     }
 
@@ -202,9 +202,9 @@ const Index = () => {
       } else if (cell.wordId === "education" && newPlacedLetters.education.size === EDUCATION.length) {
         toast.success("EDUCATION complete!");
         setOpenSection("education");
-      } else if (cell.wordId === "skills" && newPlacedLetters.skills.size === SKILLS.length) {
-        toast.success("SKILLS complete!");
-        setOpenSection("skills");
+      } else if (cell.wordId === "tools" && newPlacedLetters.tools.size === TOOLS.length) {
+        toast.success("TOOLS complete!");
+        setOpenSection("tools");
       }
     }, 300);
   };
@@ -214,12 +214,12 @@ const Index = () => {
     if (wordId === "projects") return placedLetters.projects.size === PROJECTS.length;
     if (wordId === "bio") return placedLetters.bio.size === BIO.length;
     if (wordId === "education") return placedLetters.education.size === EDUCATION.length;
-    if (wordId === "skills") return placedLetters.skills.size === SKILLS.length;
+    if (wordId === "tools") return placedLetters.tools.size === TOOLS.length;
     return false;
   };
 
   const allComplete = isComplete("experience") && isComplete("projects") && isComplete("bio") && 
-                      isComplete("education") && isComplete("skills");
+                      isComplete("education") && isComplete("tools");
 
   return (
     <div className="min-h-screen bg-background p-4 sm:p-8 pb-32">
@@ -253,7 +253,7 @@ const Index = () => {
 
         {/* Word Status Buttons */}
         <div className="flex flex-wrap justify-center gap-4 animate-slide-up" style={{ animationDelay: "200ms" }}>
-          {["bio", "education", "skills", "projects", "experience"].map((section) => (
+          {["bio", "education", "tools", "projects", "experience"].map((section) => (
             <button
               key={section}
               onClick={() => isComplete(section) && setOpenSection(section)}
@@ -417,36 +417,39 @@ const Index = () => {
       />
 
       <ResumeSection
-        title="Skills"
-        isVisible={openSection === "skills"}
+        title="Tools"
+        isVisible={openSection === "tools"}
         onClose={() => setOpenSection(null)}
         content={
           <div className="space-y-6">
             <div>
-              <h3 className="font-bold text-xl text-accent mb-2">Frontend Technologies</h3>
+              <h3 className="font-bold text-xl text-accent mb-2">Development Tools</h3>
               <p className="text-sm sm:text-base">
-                React, TypeScript, JavaScript (ES6+), HTML5, CSS3, Tailwind CSS, Redux, React Query, 
-                Next.js, Vite, Webpack
+                Git, GitHub, GitLab, VS Code, WebStorm, Postman, Docker, Kubernetes
               </p>
             </div>
             <div>
-              <h3 className="font-bold text-xl text-accent mb-2">Backend & Database</h3>
+              <h3 className="font-bold text-xl text-accent mb-2">Design & Prototyping</h3>
               <p className="text-sm sm:text-base">
-                Node.js, Express, PostgreSQL, MongoDB, REST APIs, GraphQL, Supabase
+                Figma, Adobe XD, Sketch, InVision, Storybook, Chromatic
               </p>
             </div>
             <div>
-              <h3 className="font-bold text-xl text-accent mb-2">Tools & Practices</h3>
+              <h3 className="font-bold text-xl text-accent mb-2">Testing & CI/CD</h3>
               <p className="text-sm sm:text-base">
-                Git, GitHub, CI/CD, Docker, Jest, React Testing Library, Storybook, Figma, 
-                Agile/Scrum, Code Review
+                Jest, React Testing Library, Cypress, Playwright, GitHub Actions, Jenkins, CircleCI
               </p>
             </div>
             <div>
-              <h3 className="font-bold text-xl text-accent mb-2">Soft Skills</h3>
+              <h3 className="font-bold text-xl text-accent mb-2">Project Management</h3>
               <p className="text-sm sm:text-base">
-                Problem Solving, Team Leadership, Mentoring, Communication, Project Management, 
-                User Experience Design
+                Jira, Linear, Trello, Notion, Slack, Confluence, Miro
+              </p>
+            </div>
+            <div>
+              <h3 className="font-bold text-xl text-accent mb-2">Performance & Monitoring</h3>
+              <p className="text-sm sm:text-base">
+                Lighthouse, Chrome DevTools, Sentry, LogRocket, DataDog, New Relic
               </p>
             </div>
           </div>
