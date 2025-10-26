@@ -43,22 +43,41 @@ const Index = () => {
   });
 
   // Get multiplier for a cell based on standard Scrabble board layout
+  // Map grid coordinates to standard 15x15 Scrabble board (rows 0-9, cols 3-14)
   const getMultiplier = (row: number, col: number): "TW" | "DW" | "TL" | "DL" | "STAR" | null => {
-    // Triple Word Score (TW)
-    const tripleWord = [[0,0], [0,7], [7,0], [7,7]];
-    if (tripleWord.some(([r, c]) => r === row && c === col)) return "TW";
+    // Map to standard Scrabble board coordinates (offset by starting position)
+    const boardRow = row;
+    const boardCol = col + 3; // Our grid starts at column D (3) on the Scrabble board
     
-    // Double Word Score (DW)
-    const doubleWord = [[1,1], [2,2], [3,3], [4,4], [1,6], [2,5], [3,4], [4,3]];
-    if (doubleWord.some(([r, c]) => r === row && c === col)) return "DW";
+    // Triple Word Score (TW) - Red corners
+    const tripleWord = [[0,0], [0,7], [0,14], [7,0], [7,14]];
+    if (tripleWord.some(([r, c]) => r === boardRow && c === boardCol)) return "TW";
     
-    // Triple Letter Score (TL)
-    const tripleLetter = [[1,5], [5,1], [5,5]];
-    if (tripleLetter.some(([r, c]) => r === row && c === col)) return "TL";
+    // Double Word Score (DW) - Pink diagonal
+    const doubleWord = [
+      [1,1], [1,13], [2,2], [2,12], [3,3], [3,11], [4,4], [4,10],
+      [10,4], [10,10], [11,3], [11,11], [12,2], [12,12], [13,1], [13,13]
+    ];
+    if (doubleWord.some(([r, c]) => r === boardRow && c === boardCol)) return "DW";
     
-    // Double Letter Score (DL)
-    const doubleLetter = [[0,3], [3,0], [3,7], [6,2], [6,6], [7,3]];
-    if (doubleLetter.some(([r, c]) => r === row && c === col)) return "DL";
+    // Triple Letter Score (TL) - Dark blue
+    const tripleLetter = [
+      [1,5], [1,9], [5,1], [5,5], [5,9], [5,13],
+      [9,1], [9,5], [9,9], [9,13], [13,5], [13,9]
+    ];
+    if (tripleLetter.some(([r, c]) => r === boardRow && c === boardCol)) return "TL";
+    
+    // Double Letter Score (DL) - Light blue
+    const doubleLetter = [
+      [0,3], [0,11], [2,6], [2,8], [3,0], [3,7], [3,14],
+      [6,2], [6,6], [6,8], [6,12], [7,3], [7,11],
+      [8,2], [8,6], [8,8], [8,12], [11,0], [11,7], [11,14],
+      [12,6], [12,8], [14,3], [14,11]
+    ];
+    if (doubleLetter.some(([r, c]) => r === boardRow && c === boardCol)) return "DL";
+    
+    // Center Star
+    if (boardRow === 7 && boardCol === 7) return "STAR";
     
     return null;
   };
