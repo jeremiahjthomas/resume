@@ -82,20 +82,26 @@ const Index = () => {
     return null;
   };
 
-  // Create the crossword grid
+  // Create the crossword grid - full board with multipliers
   const createGrid = (): (GridCell | null)[][] => {
-    const grid: (GridCell | null)[][] = Array(10).fill(null).map(() => Array(12).fill(null));
+    // Create a full 10x12 grid with all cells initialized
+    const grid: (GridCell | null)[][] = Array(10).fill(null).map((_, row) => 
+      Array(12).fill(null).map((_, col) => ({
+        letter: "",
+        wordId: "",
+        isPlaced: false,
+        isEmpty: true,
+        multiplier: getMultiplier(row, col),
+      }))
+    );
     
     // EXPERIENCE horizontal (row 2, starting at col 1)
     EXPERIENCE.split("").forEach((letter, idx) => {
       const col = 1 + idx;
-      grid[2][col] = {
-        letter,
-        wordId: "experience",
-        isPlaced: placedLetters.experience.has(idx),
-        isEmpty: !placedLetters.experience.has(idx),
-        multiplier: getMultiplier(2, col),
-      };
+      grid[2][col]!.letter = letter;
+      grid[2][col]!.wordId = "experience";
+      grid[2][col]!.isPlaced = placedLetters.experience.has(idx);
+      grid[2][col]!.isEmpty = !placedLetters.experience.has(idx);
     });
 
     // PROJECTS vertical (starting at row 2, col 3 - the P position)
@@ -104,13 +110,10 @@ const Index = () => {
       // Skip P (index 0) as it's shared with EXPERIENCE
       if (idx === 0) return;
       
-      grid[row][3] = {
-        letter,
-        wordId: "projects",
-        isPlaced: placedLetters.projects.has(idx),
-        isEmpty: !placedLetters.projects.has(idx),
-        multiplier: getMultiplier(row, 3),
-      };
+      grid[row][3]!.letter = letter;
+      grid[row][3]!.wordId = "projects";
+      grid[row][3]!.isPlaced = placedLetters.projects.has(idx);
+      grid[row][3]!.isEmpty = !placedLetters.projects.has(idx);
     });
 
     // BIO vertical (col 6, starting at row 1 - B above the I in EXPERIENCE)
@@ -121,13 +124,10 @@ const Index = () => {
       // I (index 1) at row 2 is shared with EXPERIENCE
       if (idx === 1) return; // Skip rendering for BIO, EXPERIENCE will handle it
       
-      grid[row][6] = {
-        letter,
-        wordId: "bio",
-        isPlaced: placedLetters.bio.has(idx),
-        isEmpty: !placedLetters.bio.has(idx),
-        multiplier: getMultiplier(row, 6),
-      };
+      grid[row][6]!.letter = letter;
+      grid[row][6]!.wordId = "bio";
+      grid[row][6]!.isPlaced = placedLetters.bio.has(idx);
+      grid[row][6]!.isEmpty = !placedLetters.bio.has(idx);
     });
 
     // EDUCATION horizontal (row 6, starting at col 3 - the E in PROJECTS)
@@ -136,13 +136,10 @@ const Index = () => {
       // Skip E (index 0) as it's shared with PROJECTS
       if (idx === 0) return;
       
-      grid[6][col] = {
-        letter,
-        wordId: "education",
-        isPlaced: placedLetters.education.has(idx),
-        isEmpty: !placedLetters.education.has(idx),
-        multiplier: getMultiplier(6, col),
-      };
+      grid[6][col]!.letter = letter;
+      grid[6][col]!.wordId = "education";
+      grid[6][col]!.isPlaced = placedLetters.education.has(idx);
+      grid[6][col]!.isEmpty = !placedLetters.education.has(idx);
     });
 
     // TOOLS horizontal (row 8, starting at col 3 - the T in PROJECTS)
@@ -151,13 +148,10 @@ const Index = () => {
       // Skip T (index 0) as it's shared with PROJECTS
       if (idx === 0) return;
       
-      grid[8][col] = {
-        letter,
-        wordId: "tools",
-        isPlaced: placedLetters.tools.has(idx),
-        isEmpty: !placedLetters.tools.has(idx),
-        multiplier: getMultiplier(8, col),
-      };
+      grid[8][col]!.letter = letter;
+      grid[8][col]!.wordId = "tools";
+      grid[8][col]!.isPlaced = placedLetters.tools.has(idx);
+      grid[8][col]!.isEmpty = !placedLetters.tools.has(idx);
     });
 
     return grid;

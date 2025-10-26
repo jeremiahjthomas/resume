@@ -36,22 +36,28 @@ export const CrosswordGrid = ({ grid, onCellDrop }: CrosswordGridProps) => {
               key={colIndex}
               onDrop={(e) => handleDrop(e, rowIndex, colIndex)}
               onDragOver={handleDragOver}
-              className={cn(
-                "w-14 h-14 sm:w-16 sm:h-16 border border-[hsl(var(--grid-line))]",
-                cell === null && "opacity-0 pointer-events-none"
-              )}
+              className="w-14 h-14 sm:w-16 sm:h-16 border border-[hsl(var(--grid-line))]"
             >
               {cell && (
-                cell.isEmpty ? (
+                // Show letter tiles if there's a letter, otherwise show multiplier background
+                cell.letter ? (
+                  cell.isEmpty ? (
+                    <ScrabbleTile
+                      letter=""
+                      isEmpty
+                      multiplier={cell.multiplier}
+                    />
+                  ) : (
+                    <ScrabbleTile
+                      letter={cell.letter}
+                      isPlaced={cell.isPlaced}
+                    />
+                  )
+                ) : (
                   <ScrabbleTile
                     letter=""
                     isEmpty
                     multiplier={cell.multiplier}
-                  />
-                ) : (
-                  <ScrabbleTile
-                    letter={cell.letter}
-                    isPlaced={cell.isPlaced}
                   />
                 )
               )}
