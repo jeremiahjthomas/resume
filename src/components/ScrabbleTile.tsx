@@ -7,6 +7,7 @@ interface ScrabbleTileProps {
   isPlaced?: boolean;
   onClick?: () => void;
   className?: string;
+  multiplier?: "TW" | "DW" | "TL" | "DL" | "STAR" | null;
 }
 
 const LETTER_POINTS: Record<string, number> = {
@@ -22,20 +23,56 @@ export const ScrabbleTile = ({
   isPlaced = false,
   onClick,
   className,
+  multiplier = null,
 }: ScrabbleTileProps) => {
   const tilePoints = points ?? LETTER_POINTS[letter.toUpperCase()] ?? 1;
+
+  // Multiplier tile styles
+  const getMultiplierStyles = () => {
+    if (!multiplier || !isEmpty) return "";
+    
+    switch (multiplier) {
+      case "TW":
+        return "bg-[hsl(var(--triple-word))] text-[hsl(var(--triple-word-foreground))] border-[hsl(var(--triple-word))]";
+      case "DW":
+        return "bg-[hsl(var(--double-word))] text-[hsl(var(--double-word-foreground))] border-[hsl(var(--double-word))]";
+      case "TL":
+        return "bg-[hsl(var(--triple-letter))] text-[hsl(var(--triple-letter-foreground))] border-[hsl(var(--triple-letter))]";
+      case "DL":
+        return "bg-[hsl(var(--double-letter))] text-[hsl(var(--double-letter-foreground))] border-[hsl(var(--double-letter))]";
+      case "STAR":
+        return "bg-[hsl(var(--center-star))] text-[hsl(var(--center-star-foreground))] border-[hsl(var(--center-star))]";
+      default:
+        return "";
+    }
+  };
+
+  const getMultiplierText = () => {
+    if (!multiplier) return "";
+    if (multiplier === "STAR") return "★";
+    return multiplier;
+  };
 
   if (isEmpty) {
     return (
       <div
         className={cn(
-          "w-14 h-14 sm:w-16 sm:h-16 rounded border-2 border-dashed border-board-dark bg-board/30 flex items-center justify-center transition-all",
-          onClick && "cursor-pointer hover:bg-board/50 hover:border-accent",
+          "w-14 h-14 sm:w-16 sm:h-16 rounded border-2 flex items-center justify-center transition-all font-bold",
+          multiplier 
+            ? getMultiplierStyles() 
+            : "border-dashed border-[hsl(var(--grid-line))] bg-[hsl(var(--board))]",
+          onClick && "cursor-pointer hover:opacity-80",
           className
         )}
         onClick={onClick}
       >
-        <span className="text-muted-foreground text-2xl font-bold">_</span>
+        {multiplier ? (
+          <span className="text-xs sm:text-sm font-bold">
+            {getMultiplierText()}
+          </span>
+        ) : (
+          <span className="text-muted-foreground text-2xl font-bold">_</span>
+        )}
       </div>
     );
   }

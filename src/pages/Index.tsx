@@ -9,6 +9,7 @@ interface GridCell {
   wordId: string;
   isPlaced: boolean;
   isEmpty: boolean;
+  multiplier?: "TW" | "DW" | "TL" | "DL" | "STAR" | null;
 }
 
 // Word configuration for crossword
@@ -41,6 +42,27 @@ const Index = () => {
     tools: new Set([0, 1]), // TO placed, missing O(2), L(3), S(4)
   });
 
+  // Get multiplier for a cell based on standard Scrabble board layout
+  const getMultiplier = (row: number, col: number): "TW" | "DW" | "TL" | "DL" | "STAR" | null => {
+    // Triple Word Score (TW)
+    const tripleWord = [[0,0], [0,7], [7,0], [7,7]];
+    if (tripleWord.some(([r, c]) => r === row && c === col)) return "TW";
+    
+    // Double Word Score (DW)
+    const doubleWord = [[1,1], [2,2], [3,3], [4,4], [1,6], [2,5], [3,4], [4,3]];
+    if (doubleWord.some(([r, c]) => r === row && c === col)) return "DW";
+    
+    // Triple Letter Score (TL)
+    const tripleLetter = [[1,5], [5,1], [5,5]];
+    if (tripleLetter.some(([r, c]) => r === row && c === col)) return "TL";
+    
+    // Double Letter Score (DL)
+    const doubleLetter = [[0,3], [3,0], [3,7], [6,2], [6,6], [7,3]];
+    if (doubleLetter.some(([r, c]) => r === row && c === col)) return "DL";
+    
+    return null;
+  };
+
   // Create the crossword grid
   const createGrid = (): (GridCell | null)[][] => {
     const grid: (GridCell | null)[][] = Array(10).fill(null).map(() => Array(12).fill(null));
@@ -53,6 +75,7 @@ const Index = () => {
         wordId: "experience",
         isPlaced: placedLetters.experience.has(idx),
         isEmpty: !placedLetters.experience.has(idx),
+        multiplier: getMultiplier(2, col),
       };
     });
 
@@ -67,6 +90,7 @@ const Index = () => {
         wordId: "projects",
         isPlaced: placedLetters.projects.has(idx),
         isEmpty: !placedLetters.projects.has(idx),
+        multiplier: getMultiplier(row, 3),
       };
     });
 
@@ -83,6 +107,7 @@ const Index = () => {
         wordId: "bio",
         isPlaced: placedLetters.bio.has(idx),
         isEmpty: !placedLetters.bio.has(idx),
+        multiplier: getMultiplier(row, 6),
       };
     });
 
@@ -97,6 +122,7 @@ const Index = () => {
         wordId: "education",
         isPlaced: placedLetters.education.has(idx),
         isEmpty: !placedLetters.education.has(idx),
+        multiplier: getMultiplier(6, col),
       };
     });
 
@@ -111,6 +137,7 @@ const Index = () => {
         wordId: "tools",
         isPlaced: placedLetters.tools.has(idx),
         isEmpty: !placedLetters.tools.has(idx),
+        multiplier: getMultiplier(8, col),
       };
     });
 
@@ -302,15 +329,19 @@ const Index = () => {
         onClose={() => setOpenSection(null)}
         content={
           <div>
-            <p className="text-base sm:text-lg leading-relaxed">
-              Creative developer passionate about building innovative web experiences. 
-              I specialize in React, TypeScript, and modern frontend technologies. 
-              When I'm not coding, you can find me playing board games or exploring new design patterns.
+            <p className="text-base sm:text-lg leading-relaxed mb-6">
+              Computer Engineering student at Texas A&M University with a passion for full-stack development, 
+              data analytics, and machine learning. I specialize in creating innovative solutions that bridge 
+              hardware and software, with experience in web development, computer vision, and embedded systems. 
+              When I'm not coding, I'm volunteering with community organizations or working on personal projects 
+              that push the boundaries of technology.
             </p>
-            <div className="mt-6 space-y-2">
-              <p><strong>Location:</strong> San Francisco, CA</p>
-              <p><strong>Email:</strong> developer@example.com</p>
-              <p><strong>GitHub:</strong> github.com/developer</p>
+            <div className="space-y-2">
+              <p><strong>Location:</strong> Irving, Texas</p>
+              <p><strong>Email:</strong> jeremiahjthomas21@gmail.com</p>
+              <p><strong>Phone:</strong> (469) 404-6089</p>
+              <p><strong>GitHub:</strong> github.com/jeremiahjthomas</p>
+              <p><strong>LinkedIn:</strong> linkedin.com/in/jeremiahjthomas</p>
             </div>
           </div>
         }
@@ -323,30 +354,41 @@ const Index = () => {
         content={
           <div className="space-y-6">
             <div>
-              <h3 className="font-bold text-xl text-accent mb-2">Interactive Resume Builder</h3>
-              <p className="text-muted-foreground mb-2">A Scrabble-themed resume that combines gaming with professional presentation</p>
-              <p className="text-sm mb-2"><strong>Tech:</strong> React, TypeScript, Tailwind CSS</p>
+              <h3 className="font-bold text-xl text-accent mb-2">Sports Analytics Display</h3>
+              <p className="text-muted-foreground mb-2">Raspberry Pi | Python | RESTful API • October 2025</p>
               <p className="text-sm leading-relaxed">
-                Developed an engaging interactive resume experience using drag-and-drop functionality 
-                and crossword-style layout. Implemented smooth animations and responsive design.
+                Connected an LED matrix display to a Raspberry Pi to display live sports statistics in real-time through 
+                API-Sports and Python. System uses a gyroscopic wireless controller to switch between sports, teams, and 
+                desired statistics through gesture detection. Rotary encoder allows user to adjust display settings. 
+                PIR motion sensors automatically turn system on and off.
               </p>
             </div>
             <div>
-              <h3 className="font-bold text-xl text-accent mb-2">Task Management App</h3>
-              <p className="text-muted-foreground mb-2">Full-stack productivity tool with real-time collaboration</p>
-              <p className="text-sm mb-2"><strong>Tech:</strong> React, Node.js, PostgreSQL, WebSocket</p>
+              <h3 className="font-bold text-xl text-accent mb-2">Computer Vision Posture Correction</h3>
+              <p className="text-muted-foreground mb-2">Python • May 2023 – June 2023</p>
               <p className="text-sm leading-relaxed">
-                Built a collaborative task management platform with real-time updates, user authentication, 
-                and team workspace features. Handles 10,000+ daily active users.
+                Used MediaPipe's Pose and Facial Landmark Detection library and Numpy to calculate the user's trunk angle, 
+                hip angle, neck angle, and shoulder relaxation to correct a user's posture in real-time. Uses OpenCV to 
+                create a camera feed and tracks 543 landmarks efficiently, accounting for garbage collection.
               </p>
             </div>
             <div>
-              <h3 className="font-bold text-xl text-accent mb-2">Design System Library</h3>
-              <p className="text-muted-foreground mb-2">Reusable component library with comprehensive documentation</p>
-              <p className="text-sm mb-2"><strong>Tech:</strong> React, Storybook, Tailwind CSS</p>
+              <h3 className="font-bold text-xl text-accent mb-2">Aggie Shell</h3>
+              <p className="text-muted-foreground mb-2">C | LINUX | x86-64 Assembly • October 2024</p>
               <p className="text-sm leading-relaxed">
-                Created a comprehensive design system with 50+ components, complete with Storybook documentation 
-                and accessibility compliance. Adopted by 5 product teams.
+                Created a mock Linux Shell by implementing pipe commands. Implemented a user-space thread library, using 
+                cooperative multitasking with the C Thread API. Connected multiple processes with UNIX pipes. Worked on 
+                applying job sessions using process groups, sessions, and signal implementation.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-bold text-xl text-accent mb-2">Electronic Security System</h3>
+              <p className="text-muted-foreground mb-2">Operational Amplifiers | Digital Logic | Circuit Design • June 2023 – February 2024</p>
+              <p className="text-sm leading-relaxed">
+                Designed and built an infrared-based security detection system that detects beam interruption to trigger 
+                an alarm state. Created an IR emitter-detector circuit with optimized resistor values for maximum range 
+                detection. Implemented signal amplification using op-amps, voltage comparison circuitry, and a digital 
+                latch system for state maintenance.
               </p>
             </div>
           </div>
@@ -360,35 +402,41 @@ const Index = () => {
         content={
           <div className="space-y-6">
             <div>
-              <h3 className="font-bold text-xl text-accent mb-1">Senior Frontend Developer</h3>
-              <p className="text-muted-foreground mb-3">Tech Innovation Inc. • 2022 - Present</p>
+              <h3 className="font-bold text-xl text-accent mb-1">Data Analyst Intern</h3>
+              <p className="text-muted-foreground mb-3">Urban Resilience AI • August 2024 – August 2025</p>
               <ul className="list-disc list-inside space-y-2 text-sm sm:text-base">
-                <li>Led development of customer-facing web applications serving 500K+ users</li>
-                <li>Improved performance by 40% through code optimization and lazy loading</li>
-                <li>Mentored 5 junior developers and conducted weekly code reviews</li>
-                <li>Architected component library adopted across 3 major products</li>
-                <li>Collaborated with design team to implement pixel-perfect responsive UIs</li>
+                <li>Combed through 100+ addresses on Google Maps to determine property visibility to locate ideal areas for data collection</li>
+                <li>Processed 700+ data points through Python automation, improving efficiency by 20%</li>
+                <li>Transformed and visualized data with Pandas and Tableau using CI/CD workflow</li>
+                <li>Highlighted structural flaws in properties affected by Hurricane Helene with PIL and OpenCV on panoramic image data</li>
               </ul>
             </div>
             <div>
-              <h3 className="font-bold text-xl text-accent mb-1">Frontend Developer</h3>
-              <p className="text-muted-foreground mb-3">Creative Solutions Ltd. • 2020 - 2022</p>
+              <h3 className="font-bold text-xl text-accent mb-1">Teaching Assistant</h3>
+              <p className="text-muted-foreground mb-3">Texas A&M University Mathematics Department • January 2024 – Present</p>
               <ul className="list-disc list-inside space-y-2 text-sm sm:text-base">
-                <li>Built responsive web applications using React and modern JavaScript</li>
-                <li>Integrated RESTful APIs and managed complex state with Redux</li>
-                <li>Implemented automated testing with Jest and React Testing Library</li>
-                <li>Collaborated with cross-functional teams in Agile environment</li>
-                <li>Reduced bug rate by 30% through comprehensive test coverage</li>
+                <li>Assisting in grading and providing lecture problem solutions for ordinary differential equations and linear algebra classes</li>
+                <li>Communicating with students via GradeScope to clarify concepts and provide feedback</li>
+                <li>Supporting professors in course material preparation and administrative tasks</li>
               </ul>
             </div>
             <div>
-              <h3 className="font-bold text-xl text-accent mb-1">Junior Web Developer</h3>
-              <p className="text-muted-foreground mb-3">StartupCo • 2019 - 2020</p>
+              <h3 className="font-bold text-xl text-accent mb-1">Undergraduate Researcher</h3>
+              <p className="text-muted-foreground mb-3">University of North Texas • August 2021 – May 2023</p>
               <ul className="list-disc list-inside space-y-2 text-sm sm:text-base">
-                <li>Developed and maintained company website and landing pages</li>
-                <li>Created email templates and automated marketing workflows</li>
-                <li>Assisted in migration from legacy codebase to React</li>
-                <li>Participated in daily standups and sprint planning sessions</li>
+                <li>Processed 300,000 data points to analyze Twitter (X) data with Pandas</li>
+                <li>Developed a model to detect geopolitical biases in Twitter (X) using Natural Language Processing techniques</li>
+                <li>Created a 91% accurate algorithm to locate the true URL and domain of a discrete link</li>
+                <li>Used tokenization, lemmatization, and stemming to create a logistic regression model predicting Twitter users' political standing</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold text-xl text-accent mb-1">Full Stack Developer</h3>
+              <p className="text-muted-foreground mb-3">Freelance • February 2019 – December 2022</p>
+              <ul className="list-disc list-inside space-y-2 text-sm sm:text-base">
+                <li>Developed User Interfaces and deployed sites for clients on Fiverr using Figma, Docker, and React</li>
+                <li>Designed 100+ logos, thumbnails, and banners for well-known Twitch Streamers, YouTubers, and TikTokers</li>
+                <li>Used Photoshop and Procreate to create professional-grade graphics and branding materials</li>
               </ul>
             </div>
           </div>
@@ -402,21 +450,23 @@ const Index = () => {
         content={
           <div className="space-y-6">
             <div>
-              <h3 className="font-bold text-xl text-accent mb-1">Bachelor of Science in Computer Science</h3>
-              <p className="text-muted-foreground mb-3">State University • 2015 - 2019</p>
+              <h3 className="font-bold text-xl text-accent mb-1">Bachelor of Science in Computer Engineering</h3>
+              <p className="text-sm text-muted-foreground mb-1">Minor in Mathematics</p>
+              <p className="text-muted-foreground mb-3">Texas A&M University • Expected May 2026</p>
               <ul className="list-disc list-inside space-y-2 text-sm sm:text-base">
-                <li>GPA: 3.8/4.0, Dean's List all semesters</li>
-                <li>Relevant coursework: Data Structures, Algorithms, Web Development, Database Systems</li>
-                <li>Senior project: Built a real-time collaboration platform using WebSocket</li>
-                <li>Member of Computer Science Club and Hackathon organizing committee</li>
+                <li>Cumulative GPA: 3.62</li>
+                <li>Dean's List</li>
+                <li>TAMU Datathon Advanced Challenge Winner</li>
+                <li>Relevant coursework: Data Structures, Algorithms, Digital Logic, Circuit Design, Computer Architecture, Embedded Systems</li>
               </ul>
             </div>
             <div>
-              <h3 className="font-bold text-xl text-accent mb-1">Certifications</h3>
+              <h3 className="font-bold text-xl text-accent mb-2">Organizations & Involvement</h3>
               <ul className="list-disc list-inside space-y-2 text-sm sm:text-base">
-                <li>AWS Certified Developer - Associate (2023)</li>
-                <li>React Advanced Patterns Certificate (2022)</li>
-                <li>TypeScript Professional Certification (2021)</li>
+                <li>Thrive South Asian Intervarsity - Missional Development Leader</li>
+                <li>Asian Presidents Council - Member</li>
+                <li>Brazos County Food Bank - Volunteer</li>
+                <li>Samaritan's Purse - Operation Christmas Child Volunteer</li>
               </ul>
             </div>
           </div>
@@ -430,33 +480,34 @@ const Index = () => {
         content={
           <div className="space-y-6">
             <div>
-              <h3 className="font-bold text-xl text-accent mb-2">Development Tools</h3>
-              <p className="text-sm sm:text-base">
-                Git, GitHub, GitLab, VS Code, WebStorm, Postman, Docker, Kubernetes
+              <h3 className="font-bold text-xl text-accent mb-2">Developer Tools</h3>
+              <p className="text-sm sm:text-base leading-relaxed">
+                Git, TensorFlow, Sklearn, Jupyter, Google Workspace, Microsoft Office Suite, Unity, Power BI, Docker
               </p>
             </div>
             <div>
-              <h3 className="font-bold text-xl text-accent mb-2">Design & Prototyping</h3>
-              <p className="text-sm sm:text-base">
-                Figma, Adobe XD, Sketch, InVision, Storybook, Chromatic
+              <h3 className="font-bold text-xl text-accent mb-2">UI/UX Design</h3>
+              <p className="text-sm sm:text-base leading-relaxed">
+                Figma, Procreate, Adobe Creative Cloud, JIRA, Confluence, Azure DevOps
               </p>
             </div>
             <div>
-              <h3 className="font-bold text-xl text-accent mb-2">Testing & CI/CD</h3>
-              <p className="text-sm sm:text-base">
-                Jest, React Testing Library, Cypress, Playwright, GitHub Actions, Jenkins, CircleCI
+              <h3 className="font-bold text-xl text-accent mb-2">Programming Languages & Frameworks</h3>
+              <p className="text-sm sm:text-base leading-relaxed">
+                Python, C++, C#, JavaScript (React, Node.js, Angular), TypeScript, Java, HTML, CSS, MATLAB, MySQL, 
+                PostgreSQL, LaTeX, Linux, Haskell, Rust, Spring Boot, Rexx, Express.js
               </p>
             </div>
             <div>
-              <h3 className="font-bold text-xl text-accent mb-2">Project Management</h3>
-              <p className="text-sm sm:text-base">
-                Jira, Linear, Trello, Notion, Slack, Confluence, Miro
+              <h3 className="font-bold text-xl text-accent mb-2">Hardware & Embedded Systems</h3>
+              <p className="text-sm sm:text-base leading-relaxed">
+                Circuit Design, Digital Logic, AutoCAD, OnShape, Verilog, HDL, Assembler
               </p>
             </div>
             <div>
-              <h3 className="font-bold text-xl text-accent mb-2">Performance & Monitoring</h3>
-              <p className="text-sm sm:text-base">
-                Lighthouse, Chrome DevTools, Sentry, LogRocket, DataDog, New Relic
+              <h3 className="font-bold text-xl text-accent mb-2">Cloud & DevOps</h3>
+              <p className="text-sm sm:text-base leading-relaxed">
+                AWS Cloud, Terraform, npm, Web Services, WebSockets, API development, Agile
               </p>
             </div>
           </div>

@@ -7,6 +7,7 @@ interface GridCell {
   wordId: string;
   isPlaced: boolean;
   isEmpty: boolean;
+  multiplier?: "TW" | "DW" | "TL" | "DL" | "STAR" | null;
 }
 
 interface CrosswordGridProps {
@@ -27,16 +28,16 @@ export const CrosswordGrid = ({ grid, onCellDrop }: CrosswordGridProps) => {
   };
 
   return (
-    <div className="inline-flex flex-col gap-1 sm:gap-2 bg-board p-4 sm:p-6 rounded-lg shadow-2xl border-4 border-board-dark">
+    <div className="inline-flex flex-col gap-0.5 bg-[hsl(var(--board-dark))] p-3 sm:p-4 rounded shadow-2xl border-2 border-[hsl(var(--grid-line))]">
       {grid.map((row, rowIndex) => (
-        <div key={rowIndex} className="flex gap-1 sm:gap-2">
+        <div key={rowIndex} className="flex gap-0.5">
           {row.map((cell, colIndex) => (
             <div
               key={colIndex}
               onDrop={(e) => handleDrop(e, rowIndex, colIndex)}
               onDragOver={handleDragOver}
               className={cn(
-                "w-14 h-14 sm:w-16 sm:h-16",
+                "w-14 h-14 sm:w-16 sm:h-16 border border-[hsl(var(--grid-line))]",
                 cell === null && "opacity-0 pointer-events-none"
               )}
             >
@@ -45,7 +46,7 @@ export const CrosswordGrid = ({ grid, onCellDrop }: CrosswordGridProps) => {
                   <ScrabbleTile
                     letter=""
                     isEmpty
-                    className="border-accent"
+                    multiplier={cell.multiplier}
                   />
                 ) : (
                   <ScrabbleTile
