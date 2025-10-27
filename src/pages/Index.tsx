@@ -3,6 +3,7 @@ import { CrosswordGrid } from "@/components/CrosswordGrid";
 import { DraggableTile } from "@/components/DraggableTile";
 import { ResumeSection } from "@/components/ResumeSection";
 import { toast } from "sonner";
+import { Linkedin, Github, Mail } from "lucide-react";
 
 interface GridCell {
   letter: string;
@@ -274,11 +275,35 @@ const Index = () => {
         {/* Header */}
         <div className="text-center space-y-4 animate-slide-up">
           <h1 className="text-4xl sm:text-5xl font-bold text-foreground font-scrabble">
-            SCRABBLE RESUME
+            JEREMIAH THOMAS
           </h1>
-          <p className="text-lg text-muted-foreground font-content">
-            Drag tiles to complete the crossword and unlock resume sections
-          </p>
+          <div className="flex items-center justify-center gap-6 mt-4">
+            <a 
+              href="https://www.linkedin.com/in/jeremiahjthomas" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-accent transition-colors duration-200"
+              aria-label="LinkedIn Profile"
+            >
+              <Linkedin size={28} />
+            </a>
+            <a 
+              href="https://github.com/jeremiahjthomas" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-accent transition-colors duration-200"
+              aria-label="GitHub Profile"
+            >
+              <Github size={28} />
+            </a>
+            <a 
+              href="mailto:jeremiahjthomas21@gmail.com"
+              className="text-muted-foreground hover:text-accent transition-colors duration-200"
+              aria-label="Email"
+            >
+              <Mail size={28} />
+            </a>
+          </div>
         </div>
 
         {/* Crossword Grid */}
