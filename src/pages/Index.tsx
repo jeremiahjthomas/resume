@@ -311,18 +311,6 @@ const Index = () => {
           <CrosswordGrid grid={createGrid()} onCellDrop={handleCellDrop} />
         </div>
 
-        {/* Completion Message */}
-        {allComplete && !openSection && (
-          <div className="text-center animate-slide-up bg-accent/20 rounded-lg p-6 border-2 border-accent max-w-2xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-bold text-foreground font-scrabble mb-2">
-              CONGRATULATIONS!
-            </h2>
-            <p className="text-lg text-foreground font-content">
-              You've completed all words! Click any word to view its section. 🎉
-            </p>
-          </div>
-        )}
-
         {/* Word Status Buttons */}
         <div className="flex flex-wrap justify-center gap-4 animate-slide-up" style={{ animationDelay: "200ms" }}>
           {["bio", "education", "tools", "projects", "experience"].map((section) => (
