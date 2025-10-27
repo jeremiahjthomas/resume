@@ -85,8 +85,8 @@ const Index = () => {
 
   // Create the crossword grid - full board with multipliers
   const createGrid = (): (GridCell | null)[][] => {
-    // Create a full 10x12 grid with all cells initialized
-    const grid: (GridCell | null)[][] = Array(10).fill(null).map((_, row) => 
+    // Create a full 11x12 grid with all cells initialized (shifted down by 1)
+    const grid: (GridCell | null)[][] = Array(11).fill(null).map((_, row) => 
       Array(12).fill(null).map((_, col) => ({
         letter: "",
         wordId: "",
@@ -96,18 +96,18 @@ const Index = () => {
       }))
     );
     
-    // EXPERIENCE horizontal (row 2, starting at col 1)
+    // EXPERIENCE horizontal (row 3, starting at col 1) - shifted down by 1
     EXPERIENCE.split("").forEach((letter, idx) => {
       const col = 1 + idx;
-      grid[2][col]!.letter = letter;
-      grid[2][col]!.wordId = "experience";
-      grid[2][col]!.isPlaced = placedLetters.experience.has(idx);
-      grid[2][col]!.isEmpty = !placedLetters.experience.has(idx);
+      grid[3][col]!.letter = letter;
+      grid[3][col]!.wordId = "experience";
+      grid[3][col]!.isPlaced = placedLetters.experience.has(idx);
+      grid[3][col]!.isEmpty = !placedLetters.experience.has(idx);
     });
 
-    // PROJECTS vertical (starting at row 2, col 3 - the P position)
+    // PROJECTS vertical (starting at row 3, col 3 - the P position) - shifted down by 1
     PROJECTS.split("").forEach((letter, idx) => {
-      const row = 2 + idx;
+      const row = 3 + idx;
       // Skip P (index 0) as it's shared with EXPERIENCE
       if (idx === 0) return;
       
@@ -117,12 +117,12 @@ const Index = () => {
       grid[row][3]!.isEmpty = !placedLetters.projects.has(idx);
     });
 
-    // BIO vertical (col 6, starting at row 1 - B above the I in EXPERIENCE)
-    // B at row 1, I at row 2 (shared with EXPERIENCE), O at row 3
+    // BIO vertical (col 6, starting at row 2 - B above the I in EXPERIENCE) - shifted down by 1
+    // B at row 2, I at row 3 (shared with EXPERIENCE), O at row 4
     BIO.split("").forEach((letter, idx) => {
-      const row = 1 + idx;
+      const row = 2 + idx;
       
-      // I (index 1) at row 2 is shared with EXPERIENCE
+      // I (index 1) at row 3 is shared with EXPERIENCE
       if (idx === 1) return; // Skip rendering for BIO, EXPERIENCE will handle it
       
       grid[row][6]!.letter = letter;
@@ -131,28 +131,28 @@ const Index = () => {
       grid[row][6]!.isEmpty = !placedLetters.bio.has(idx);
     });
 
-    // EDUCATION horizontal (row 6, starting at col 3 - the E in PROJECTS)
+    // EDUCATION horizontal (row 7, starting at col 3 - the E in PROJECTS) - shifted down by 1
     EDUCATION.split("").forEach((letter, idx) => {
       const col = 3 + idx;
       // Skip E (index 0) as it's shared with PROJECTS
       if (idx === 0) return;
       
-      grid[6][col]!.letter = letter;
-      grid[6][col]!.wordId = "education";
-      grid[6][col]!.isPlaced = placedLetters.education.has(idx);
-      grid[6][col]!.isEmpty = !placedLetters.education.has(idx);
+      grid[7][col]!.letter = letter;
+      grid[7][col]!.wordId = "education";
+      grid[7][col]!.isPlaced = placedLetters.education.has(idx);
+      grid[7][col]!.isEmpty = !placedLetters.education.has(idx);
     });
 
-    // TOOLS horizontal (row 8, starting at col 3 - the T in PROJECTS)
+    // TOOLS horizontal (row 9, starting at col 3 - the T in PROJECTS) - shifted down by 1
     TOOLS.split("").forEach((letter, idx) => {
       const col = 3 + idx;
       // Skip T (index 0) as it's shared with PROJECTS
       if (idx === 0) return;
       
-      grid[8][col]!.letter = letter;
-      grid[8][col]!.wordId = "tools";
-      grid[8][col]!.isPlaced = placedLetters.tools.has(idx);
-      grid[8][col]!.isEmpty = !placedLetters.tools.has(idx);
+      grid[9][col]!.letter = letter;
+      grid[9][col]!.wordId = "tools";
+      grid[9][col]!.isPlaced = placedLetters.tools.has(idx);
+      grid[9][col]!.isEmpty = !placedLetters.tools.has(idx);
     });
 
     return grid;
@@ -187,7 +187,7 @@ const Index = () => {
         newPlacedLetters.bio.add(1);
       }
     } else if (cell.wordId === "projects") {
-      const idx = row - 2;
+      const idx = row - 3; // PROJECTS now starts at row 3
       newPlacedLetters.projects.add(idx);
       // P is shared with EXPERIENCE
       if (idx === 0) {
@@ -202,7 +202,7 @@ const Index = () => {
         newPlacedLetters.tools.add(0);
       }
     } else if (cell.wordId === "bio") {
-      const idx = row - 1; // BIO starts at row 1, not row 2
+      const idx = row - 2; // BIO now starts at row 2
       newPlacedLetters.bio.add(idx);
       // I is shared with EXPERIENCE
       if (idx === 1) {
