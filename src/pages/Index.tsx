@@ -4,6 +4,8 @@ import { DraggableTile } from "@/components/DraggableTile";
 import { ResumeSection } from "@/components/ResumeSection";
 import { toast } from "sonner";
 import { Linkedin, Github, Mail } from "lucide-react";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Card } from "@/components/ui/card";
 
 interface GridCell {
   letter: string;
@@ -355,6 +357,18 @@ const Index = () => {
         onClose={() => setOpenSection(null)}
         content={
           <div>
+            {/* Profile Picture Section */}
+            <div className="flex flex-col items-center mb-8">
+              <div className="w-48 h-48 rounded-full bg-muted flex items-center justify-center border-4 border-accent mb-4">
+                <img 
+                  src="/placeholder.svg" 
+                  alt="Profile"
+                  className="w-full h-full rounded-full object-cover"
+                />
+              </div>
+              <p className="text-sm text-muted-foreground italic">Add your profile picture here</p>
+            </div>
+
             <p className="text-base sm:text-lg leading-relaxed mb-6">
               Computer Engineering student at Texas A&M University with a passion for full-stack development, 
               data analytics, and machine learning. I specialize in creating innovative solutions that bridge 
@@ -378,44 +392,120 @@ const Index = () => {
         isVisible={openSection === "projects"}
         onClose={() => setOpenSection(null)}
         content={
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div>
               <h3 className="font-bold text-xl text-accent mb-2">Sports Analytics Display</h3>
               <p className="text-muted-foreground mb-2">Raspberry Pi | Python | RESTful API • October 2025</p>
-              <p className="text-sm leading-relaxed">
+              <p className="text-sm leading-relaxed mb-4">
                 Connected an LED matrix display to a Raspberry Pi to display live sports statistics in real-time through 
                 API-Sports and Python. System uses a gyroscopic wireless controller to switch between sports, teams, and 
                 desired statistics through gesture detection. Rotary encoder allows user to adjust display settings. 
                 PIR motion sensors automatically turn system on and off.
               </p>
+              <Carousel className="w-full max-w-xl mx-auto">
+                <CarouselContent>
+                  {[1, 2, 3].map((i) => (
+                    <CarouselItem key={i}>
+                      <Card className="p-2">
+                        <div className="aspect-video bg-muted flex items-center justify-center rounded-md">
+                          <img 
+                            src="/placeholder.svg" 
+                            alt={`Sports Analytics Display - Image ${i}`}
+                            className="w-full h-full object-cover rounded-md"
+                          />
+                        </div>
+                      </Card>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+              </Carousel>
             </div>
             <div>
               <h3 className="font-bold text-xl text-accent mb-2">Computer Vision Posture Correction</h3>
               <p className="text-muted-foreground mb-2">Python • May 2023 – June 2023</p>
-              <p className="text-sm leading-relaxed">
+              <p className="text-sm leading-relaxed mb-4">
                 Used MediaPipe's Pose and Facial Landmark Detection library and Numpy to calculate the user's trunk angle, 
                 hip angle, neck angle, and shoulder relaxation to correct a user's posture in real-time. Uses OpenCV to 
                 create a camera feed and tracks 543 landmarks efficiently, accounting for garbage collection.
               </p>
+              <Carousel className="w-full max-w-xl mx-auto">
+                <CarouselContent>
+                  {[1, 2, 3].map((i) => (
+                    <CarouselItem key={i}>
+                      <Card className="p-2">
+                        <div className="aspect-video bg-muted flex items-center justify-center rounded-md">
+                          <img 
+                            src="/placeholder.svg" 
+                            alt={`Posture Correction - Image ${i}`}
+                            className="w-full h-full object-cover rounded-md"
+                          />
+                        </div>
+                      </Card>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+              </Carousel>
             </div>
             <div>
               <h3 className="font-bold text-xl text-accent mb-2">Aggie Shell</h3>
               <p className="text-muted-foreground mb-2">C | LINUX | x86-64 Assembly • October 2024</p>
-              <p className="text-sm leading-relaxed">
+              <p className="text-sm leading-relaxed mb-4">
                 Created a mock Linux Shell by implementing pipe commands. Implemented a user-space thread library, using 
                 cooperative multitasking with the C Thread API. Connected multiple processes with UNIX pipes. Worked on 
                 applying job sessions using process groups, sessions, and signal implementation.
               </p>
+              <Carousel className="w-full max-w-xl mx-auto">
+                <CarouselContent>
+                  {[1, 2, 3].map((i) => (
+                    <CarouselItem key={i}>
+                      <Card className="p-2">
+                        <div className="aspect-video bg-muted flex items-center justify-center rounded-md">
+                          <img 
+                            src="/placeholder.svg" 
+                            alt={`Aggie Shell - Image ${i}`}
+                            className="w-full h-full object-cover rounded-md"
+                          />
+                        </div>
+                      </Card>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+              </Carousel>
             </div>
             <div>
               <h3 className="font-bold text-xl text-accent mb-2">Electronic Security System</h3>
               <p className="text-muted-foreground mb-2">Operational Amplifiers | Digital Logic | Circuit Design • June 2023 – February 2024</p>
-              <p className="text-sm leading-relaxed">
+              <p className="text-sm leading-relaxed mb-4">
                 Designed and built an infrared-based security detection system that detects beam interruption to trigger 
                 an alarm state. Created an IR emitter-detector circuit with optimized resistor values for maximum range 
                 detection. Implemented signal amplification using op-amps, voltage comparison circuitry, and a digital 
                 latch system for state maintenance.
               </p>
+              <Carousel className="w-full max-w-xl mx-auto">
+                <CarouselContent>
+                  {[1, 2, 3].map((i) => (
+                    <CarouselItem key={i}>
+                      <Card className="p-2">
+                        <div className="aspect-video bg-muted flex items-center justify-center rounded-md">
+                          <img 
+                            src="/placeholder.svg" 
+                            alt={`Security System - Image ${i}`}
+                            className="w-full h-full object-cover rounded-md"
+                          />
+                        </div>
+                      </Card>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+              </Carousel>
             </div>
           </div>
         }
