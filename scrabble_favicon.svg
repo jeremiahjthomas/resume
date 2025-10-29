@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Background gradient for triple word score look -->
+  <defs>
+    <linearGradient id="tileGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e74c3c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c0392b;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Outer border -->
+  <rect x="2" y="2" width="96" height="96" rx="8" fill="url(#tileGradient)" filter="url(#shadow)"/>
+  
+  <!-- Inner tile -->
+  <rect x="6" y="6" width="88" height="88" rx="6" fill="#d35400" stroke="#a04000" stroke-width="1"/>
+  
+  <!-- JT letters -->
+  <text x="50" y="62" font-family="Arial Black, sans-serif" font-size="48" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="-2">JT</text>
+  
+  <!-- Small multiplier text at bottom -->
+  <text x="50" y="85" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#fff" text-anchor="middle" opacity="0.9">TRIPLE</text>
+  
+
+</svg>
